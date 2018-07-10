@@ -100,6 +100,14 @@
                 console.info('Trigger:', e.trigger);
                 $.toast("复制成功！")
                 e.clearSelection();
+                setupWebViewJavascriptBridge(function (bridge) {
+                    //参数1： pay 注册flag 供原生使用，要和原生统一
+                    //参数2： 是调起原生时向原生传递的参数
+                    //参数3： 原生调用回调返回的数据
+                    bridge.callHandler('yangsaCopy', e.text, function (resp) {
+
+                    });
+                })                
             });
 
             clipboard.on('error', function (e) {

@@ -178,6 +178,15 @@
                 $.toast("淘口令复制成功！")
                 e.clearSelection();
                 $("#taokouling-prop").css("display", "none")
+                setupWebViewJavascriptBridge(function (bridge) {
+                    //参数1： pay 注册flag 供原生使用，要和原生统一
+                    //参数2： 是调起原生时向原生传递的参数
+                    //参数3： 原生调用回调返回的数据
+                    bridge.callHandler('yangsaCopy', e.text, function (resp) {
+                        
+                    });
+                })
+                
             });
 
             clipboard.on('error', function (e) {
@@ -305,7 +314,7 @@
                             if (goodsType == 4 || goodsType == 2) {
                                 window.location.href = "./success.html?data=" + encodeURI(JSON.stringify(res.Data))
                             } else if (goodsType == 3) {
-                                if (res.Data.jfMallJumpType != "forward") {
+                                if (res.Data.jfMallJumpType == "forward") {
                                     window.location.href = res.Data.exchangeUrl
                                 } else {
                                     $("#taokouling-prop").css("display", "block")
