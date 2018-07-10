@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>商品详情</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css"> -->
+    <link rel="stylesheet" href="./assets/css/detail.css">
+    <style>
+    </style>
+
+</head>
+
+<body>
+    <div class="page-group">
+        <div class="page page-current">
+            <!-- 你的html代码 -->
+            <div style="display: none;" id="goods">
+                <div class="my-content">
+                    <div class="main-pic">
+                        <img src="./assets/img/timeout.png" alt="">
+                    </div>
+                    <div class="goods-title"></div>
+                    <!-- <div class="status">商品已发货</div>
+                    <div class="express-id">
+                        快递单号：1234568970328943
+                        <span class="copy">复制</span>
+                    </div> -->
+                    <div class="money">
+                        支付金额：
+                        <span class="money-num">6000积分</span>
+                    </div>
+                    <div class="address">
+                        <div class="address-label">配送地址：</div>
+                        <div class="address-label">
+                            <div>默默 16177638873 </div>
+                            <div>长沙市 岳麓区 ........</div>
+                        </div>
+                    </div>
+                    <!-- <div class="order-id">订单编号：1234568970328943</div>
+                    <div class="order-time">下单时间：2018-07-04 12:24:56</div> -->
+                </div>
+                <div class="my-content">
+                    <div class="comment">
+                        说明：
+                    </div>
+                    <div class="col-100">
+                        <button onclick="commit()" id="exchange-btn1" class="button button-big button-fill button-danger"></button>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;" id="alipay">
+                <div class="content">
+                    <div class="list-block">
+                        <ul>
+                            <!-- Text inputs -->
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon icon-form-name"></i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">支付宝账号</div>
+                                        <div class="item-input">
+                                            <input id="alipay-num" type="text" placeholder="邮箱/手机号码">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon icon-form-name"></i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">收款人姓名</div>
+                                        <div class="item-input">
+                                            <input id="alipay-name" type="text" placeholder="账号对应的认证姓名">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="button-area">
+                        <div id="redbag-wrap" class="row">
+
+                        </div>
+                    </div>
+                    <div class="button-area">
+                        <div class="jifen-cost">需要
+                            <span id="points-cost" class="red"> 50</span>积分</div>
+                        <div class="col-100">
+                            <button onclick="commit()" id="exchange-btn2" class="button button-big button-fill button-danger"></button>
+                        </div>
+                        <div class="commet">注：兑换的红包将会进入到您的支付宝余额，可在账单中查询！</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <script src="./assets/js/zepto.cookie.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <!-- <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script> -->
+    <script>
+        var total = 0
+        var rechargeAmount = 0
+        console.log("come in detail")
+        window.onload = function () {
+            console.log("loaded")
+            myRequest("/jfmall/getGoodsInfo", { goodsCode: GetQueryString("goodsCode") }, function (res) {
+                if (res.status == 1) {
+                    total = res.Data.total
+                    // $(document).attr("title", res.Data.title)                    
+                    switch (res.Data.goodsType) {
+                        case 4:
+                            $("#alipay").css("display", "block")
+                            $("#alipay-num").val(res.Data.alipay)
+                            $("#alipay-name").val(res.Data.realName)
+                            $("#exchange-btn2").html(res.Data.btnText)
+                            redbagList = $.parseJSON(res.Data.exchangeRule)
+
+                            redbagList.forEach(function (item, index) {
+                                var btn_status = "light"
+                                if (index == 0) {
+                                    btn_status = "danger"
+                                    rechargeAmount = item.dwmz
+                                    $("#points-cost").html(item.dwkjf)
+                                    if (item.dwkjf > total) {
+                                        $("#exchange-btn").attr("disabled", "disabled")
+                                        $("#exchange-btn").removeClass("button-danger")
+                                        $("#exchange-btn").addClass("button-light")
+                                    }
+                                }
+                                html = `
+                                        <div onclick="chooseRedbag(this,${item.dwkjf},${item.dwmz})" class="col-50 redbag-item">
+                                            <a href="#" class="button button-big button-fill button-${btn_status}">${item.dwmz}元</a>
+                                        </div>
+                                        `
+                                $("#redbag-wrap").append(html)
+                            })
+                            break
+                        default:
+                            $("#goods").css("display", "block")
+                            $("#exchange-btn1").html(res.Data.btnText)
+                            $(".goods-title").html(res.Data.title)
+                            break
+                    }
+                    $(".main-pic img").attr("src", res.Data.picUrl)
+                } else {
+                    $.toast(res.errorMsg)
+                }
+            })
+        }
+        function chooseRedbag(that, kjf, dwmz) {
+            rechargeAmount = dwmz
+            var redbag_item = $(".redbag-item a")
+            redbag_item.forEach(function (item) {
+                $(item).removeClass("button-danger")
+                $(item).addClass("button-light")
+            })
+            $(that).children("a").addClass("button-danger")
+            $("#points-cost").html(kjf)
+            if (kjf > total) {
+                $("#exchange-btn").attr("disabled", "disabled")
+                $("#exchange-btn").removeClass("button-danger")
+                $("#exchange-btn").addClass("button-light")
+            } else {
+                $("#exchange-btn").removeAttr("disabled")
+                $("#exchange-btn").removeClass("button-light")
+                $("#exchange-btn").addClass("button-danger")
+            }
+        }
+
+        function commit() {
+            var pointsCost = $("#points-cost").html()
+            console.log(parseInt(pointsCost))
+            $.confirm('确认兑换？',
+                function () {
+                    // $.alert('You clicked Ok button');
+                    var data = {
+                        goodsCode: GetQueryString("goodsCode"),
+                        alipayAccount: $("#alipay-num").val(),
+                        alipayName: $("#alipay-name").val(),
+                        rechargeAmount: rechargeAmount,
+                        receiveName: 1,
+                        receivePhoneNum: 1,
+                        receiveAddress: 1
+                    }
+                    myRequest("/jfmall/exchange", data, function (res) {
+                        console.log(res)
+                        if (res.status == 1) {
+                            // $.toast("兑换成功！")
+                            window.location.href = "./success.html?data=" + JSON.stringify(res.Data)
+                        } else {
+                            $.toast(res.errorMsg)
+                        }
+                    })
+                },
+                function () {
+                    // $.alert('此次兑换取消！');
+                }
+            );
+        }
+    </script>
+</body>
+
+</html>

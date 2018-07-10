@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>兑换结果</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <link rel="stylesheet" href="./assets/css/success.css">
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css"> -->
+    <style>
+   
+    </style>
+
+</head>
+
+<body>
+    <div class="page-group">
+        <div class="page page-current">
+            <!-- 你的html代码 -->
+            <div class="my-header">
+                <img class="success-icon" src="#" alt="">
+                <div class="success-text"></div>
+                <div class="success-tips">关注“兑奖记录”，掌握订单最新状态</div>
+            </div>
+            <div class="my-body">
+                <div class="goods-detail">
+                    <div class="goods-img">
+                        <img src="#" alt="">
+                    </div>
+                    <div class="goods-info">
+                        <div id="title"></div>
+                        <!-- <div>还剩20天 (有效期至2017-07-22)</div> -->
+                    </div>
+                </div>
+                <div class="info">
+                    <div class="info-item">积分消耗：<span id="score"></span>积分</div>
+                    <div class="info-item">订单编号：<span id="orderNo"></span></div>
+                    <div class="info-item">下单时间：<span id="createTime"></span></div>
+                </div>
+            </div>
+            <div class="my-body">
+                <div class="commet">
+                    
+                </div>
+            </div>
+            <button onclick="toIndex()" id="backToIndex" class="button button-big button-fill button-danger">回到首页</button>
+        </div>
+    </div>
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <script src="./assets/js/zepto.cookie.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <!-- <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script> -->
+    <script>
+    var pageInfo = JSON.parse(GetQueryString("data")) 
+    console.log(pageInfo)
+    window.onload = function() {
+        $(".button-danger").css("background-color","#"+$.fn.cookie("colorNavRight"))
+        switch(pageInfo.status) {
+            case 0:
+            $(".success-icon").attr("src", "./assets/img/pedding.png")
+            $(".success-text").html("正在处理兑换...")
+            $(".commet").html("说明:"+pageInfo.resultText)
+            break
+            case 1:
+            $(".success-icon").attr("src", "./assets/img/success.png")
+            $(".success-text").html("兑换成功！")
+            $(".commet").html("说明:"+pageInfo.resultText)
+            break
+            case 2:
+            $(".success-icon").attr("src", "./assets/img/failed.png")
+            $(".success-text").html("兑换失败！")
+            $(".commet").html("说明:"+pageInfo.refuseReason)
+            break
+            default:
+            break
+        }
+        $(".goods-img img").attr("src", pageInfo.picUrl)
+        $("#title").html(pageInfo.title)
+        $("#score").html(pageInfo.score)
+        $("#orderNo").html(pageInfo.orderNo)
+        $("#createTime").html(pageInfo.createTime)
+        // $(".commet").html("说明:"+pageInfo.resultText)
+    }
+
+    function toIndex() {
+        window.location.href = "./index.html?session="+$.fn.cookie("session")
+    }
+    </script>
+</body>
+
+</html>

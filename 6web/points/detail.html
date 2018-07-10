@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>商品详情</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css"> -->
+    <link rel="stylesheet" href="./assets/css/detail.css">
+    <style>
+        .button.button-fill:active {
+            background: #ccc;
+        }
+
+        #exchange-btn2 {
+            z-index: 999;
+        }
+
+        #copy {
+            color: #0894ec;
+        }
+
+        #taokouling-prop {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .taokeling-wrap {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 0.6rem;
+            width: 70%;
+            height: 5rem;
+            text-align: center;
+            left: 15%;
+            top: 10rem;
+        }
+
+        .taokeling-wrap div:first-child {
+            margin-top: 0.8rem;
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .taokeling-wrap div:last-child {
+            margin-top: 0.6rem;
+            color: #0894ec;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="page-group">
+        <div class="page page-current">
+            <!-- 你的html代码 -->
+            <div class="content" style="display: none;" id="goods">
+                <div class="my-content">
+                    <div class="main-pic">
+                        <img src="./assets/img/timeout.png" alt="">
+                    </div>
+                    <div class="goods-title"></div>
+
+                    <div class="money">
+                        <span class="money-num">
+                            <span id="score"></span>积分</span>
+                        <span class="stock">还剩
+                            <span id="stock"></span>件</span>
+                    </div>
+                    <div id="taokeling">
+
+                    </div>
+                    <div style="display: none;" id="address" class="address">
+                        <div class="address-label">配送地址：</div>
+                        <div id="address-detail" class="address-label">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="my-content">
+                    <div style="padding: 1.2rem;" id="goods-des" class="comment">
+
+                    </div>
+                    <div class="col-100">
+
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;" id="alipay">
+                <div class="content">
+                    <div class="list-block">
+                        <ul>
+                            <!-- Text inputs -->
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon icon-form-name"></i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">支付宝账号</div>
+                                        <div class="item-input">
+                                            <input id="alipay-num" type="text" placeholder="邮箱/手机号码">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon icon-form-name"></i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">收款人姓名</div>
+                                        <div class="item-input">
+                                            <input id="alipay-name" type="text" placeholder="账号对应的认证姓名">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="button-area">
+                        <div id="redbag-wrap" class="row">
+
+                        </div>
+                    </div>
+                    <div class="button-area">
+                        <div class="jifen-cost">需要
+                            <span id="points-cost" class="red"> 50</span>积分</div>
+                        <div class="col-100">
+                            <button onclick="commit()" id="exchange-btn2" class="button button-big button-fill button-danger"></button>
+                        </div>
+                        <div class="commet">注：兑换的红包将会进入到您的支付宝余额，可在账单中查询！</div>
+                    </div>
+                </div>
+            </div>
+            <button style="display: none;" onclick="commit()" id="exchange-btn1" class="button button-big button-fill button-danger"></button>
+            <div style="display: none;" id="taokouling-prop">
+                <div class="taokeling-wrap">
+                    <div id="taokouling-text"></div>
+                    <div data-clipboard-text="" id="copy">复制淘口令</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <script src="./assets/js/zepto.cookie.js"></script>
+    <script src="./assets/js/clipboard.min.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <!-- <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script> -->
+    <script>
+        var total = 0
+        var rechargeAmount = 0
+        var receiveName = ""
+        var receivePhoneNum = ""
+        var receiveAddress = ""
+        var goodsType = 0
+        window.onload = function () {
+            var clipboard = new ClipboardJS('#copy');
+
+            clipboard.on('success', function (e) {
+                console.info('Action:', e.action);
+                console.info('Text:', e.text);
+                console.info('Trigger:', e.trigger);
+                $.toast("淘口令复制成功！")
+                e.clearSelection();
+                $("#taokouling-prop").css("display", "none")
+            });
+
+            clipboard.on('error', function (e) {
+                console.error('Action:', e.action);
+                console.error('Trigger:', e.trigger);
+            });
+            $(".button-danger").css("background-color", "#" + $.fn.cookie("colorNavRight"))
+            myRequest("/jfmall/getGoodsInfo", { goodsCode: GetQueryString("goodsCode") }, function (res) {
+                if (res.status == 1) {
+                    total = res.Data.total
+                    goodsType = res.Data.goodsType
+                    switch (goodsType) {
+                        case 4:
+                            $("#alipay").css("display", "block")
+                            $("#alipay-num").val(res.Data.alipay)
+                            $("#alipay-name").val(res.Data.realName)
+                            $("#exchange-btn2").html(res.Data.btnText)
+                            redbagList = $.parseJSON(res.Data.exchangeRule)
+
+                            redbagList.forEach(function (item, index) {
+                                var btn_status = "light"
+                                if (index == 0) {
+                                    btn_status = "danger"
+                                    rechargeAmount = item.dwmz
+                                    $("#points-cost").html(item.dwkjf)
+                                    if (item.dwkjf > total) {
+                                        $("#exchange-btn").attr("disabled", "disabled")
+                                        $("#exchange-btn").removeClass("button-danger")
+                                        $("#exchange-btn").addClass("button-light")
+                                    }
+                                }
+                                html = `
+                                        <div onclick="chooseRedbag(this,${item.dwkjf},${item.dwmz})" class="col-50 redbag-item">
+                                            <div class="button button-big button-fill button-${btn_status}">${item.dwmz}元</div>
+                                        </div>
+                                        `
+                                $("#redbag-wrap").append(html)
+                            })
+                            break
+                        default:
+                            $("#exchange-btn1").css("display", "block")
+                            myRequest("/jfmall/getDefaultAddress", {}, function (addrRes) {
+                                console.log(addrRes)
+                                if (addrRes.status == 1) {
+                                    receiveAddress = addrRes.Data && addrRes.Data.allAddress
+                                    receiveName = addrRes.Data && addrRes.Data.receiveName
+                                    receivePhoneNum = addrRes.Data && addrRes.Data.receivePhoneNum
+                                    if (goodsType == 2) {
+                                        $("#address").css("display", "block")
+                                        console.log(addrRes.Data)
+                                        if (addrRes.Data) {
+                                            $("#address-detail").html(`<div>${addrRes.Data.receiveName} ${addrRes.Data.receivePhoneNum}</div>
+                                                                   <div>${addrRes.Data.allAddress}</div>`)
+                                        } else {
+                                            $("#address-detail").html("<a external href='./address.html'>您还未填写收货信息，马上去填写 >></a>")
+                                        }
+                                    }
+                                }
+                            })
+                            rechargeAmount = res.Data.score
+                            $("body").css("position", "absolute")
+                            $("#goods").css("display", "block")
+                            $("#exchange-btn1").html(res.Data.btnText)
+                            $(".goods-title").html(res.Data.title)
+                            $("#stock").html(res.Data.stock)
+                            $("#score").html(res.Data.score)
+                            $("#goods-des").html(res.Data.contentText)
+                            break
+                    }
+
+                    $(".main-pic img").attr("src", res.Data.picUrl)
+                    imgList = $("#goods-des img")
+                    imgList.forEach(function (item, index) {
+                        $(item).css("width", "100%")
+                    })
+                } else {
+                    $.toast(res.errorMsg)
+                }
+            })
+        }
+        function chooseRedbag(that, kjf, dwmz) {
+            rechargeAmount = dwmz
+            var redbag_item = $(".redbag-item div")
+            redbag_item.forEach(function (item) {
+                $(item).removeClass("button-danger")
+                $(item).addClass("button-light")
+            })
+            $(that).children("div").addClass("button-danger")
+            $("#points-cost").html(kjf)
+            if (kjf > total) {
+                $("#exchange-btn").attr("disabled", "disabled")
+                $("#exchange-btn").removeClass("button-danger")
+                $("#exchange-btn").addClass("button-light")
+            } else {
+                $("#exchange-btn").removeAttr("disabled")
+                $("#exchange-btn").removeClass("button-light")
+                $("#exchange-btn").addClass("button-danger")
+            }
+        }
+
+        function commit() {
+            var pointsCost = $("#points-cost").html()
+            console.log(parseInt(pointsCost))
+            console.log("1:" + $("#address").html())
+            if ($("#address").css("display") == "block" && $("#address").html().indexOf("您还未填写收货信息") != -1) {
+                $.toast("请先输入收货地址！")
+                return
+            }
+            $.confirm('确认兑换？',
+                function () {
+                    // $.alert('You clicked Ok button');
+                    var data = {
+                        goodsCode: GetQueryString("goodsCode"),
+                        alipayAccount: $("#alipay-num").val() || "",
+                        alipayName: $("#alipay-name").val() || "",
+                        rechargeAmount: rechargeAmount,
+                        receiveName: receiveName,
+                        receivePhoneNum: receivePhoneNum,
+                        receiveAddress: receiveAddress
+                    }
+                    myRequest("/jfmall/exchange", data, function (res) {
+                        console.log(res)
+                        if (res.status == 1) {
+                            // $.toast("兑换成功！")
+                            if (goodsType == 4 || goodsType == 2) {
+                                window.location.href = "./success.html?data=" + encodeURI(JSON.stringify(res.Data))
+                            } else if (goodsType == 3) {
+                                if (res.Data.jfMallJumpType != "forward") {
+                                    window.location.href = res.Data.exchangeUrl
+                                } else {
+                                    $("#taokouling-prop").css("display", "block")
+                                    $("#taokouling-text").html(res.Data.returnTaokoulin)
+                                    $("#copy").attr("data-clipboard-text", res.Data.returnTaokoulin)
+                                }
+                            } else {
+                                window.location.href = res.Data.exchangeUrl
+                            }
+
+                        } else {
+                            $.toast(res.errorMsg)
+                        }
+                    })
+                },
+                function () {
+                    // $.alert('此次兑换取消！');
+                }
+            );
+        }
+    </script>
+</body>
+
+</html>

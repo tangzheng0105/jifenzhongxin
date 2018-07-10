@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>积分商城</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <link rel="stylesheet" href="./assets/css/index.css">
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css"> -->
+    <style>
+
+    </style>
+
+</head>
+
+<body>
+    <div class="page-group">
+        <div class="page page-current">
+            <!-- 你的html代码 -->
+            <header class="bar bar-nav">
+                <h1 class="title">
+                    <img class="jifen-icon" src="./assets/img/jifen2.png" alt="">
+                    <span id="points" class="text-big">0</span>
+                    <span>积分</span>
+                </h1>
+            </header>
+            <div class="content">
+                <div class="my-bar">
+                    <a external href="./address.html">
+                        <div class="ctr-item">
+                            <img class="jifen-icon" src="./assets/img/addr.png" alt=""> 收货地址
+                        </div>
+                    </a>
+                    <a external href="./record.html">
+                        <div class="ctr-item">
+                            <img class="jifen-icon" src="./assets/img/record.png" alt=""> 兑换记录
+                        </div>
+                    </a>
+                </div>
+                <div class="goods-wrap">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <script src="./assets/js/zepto.cookie.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <!-- <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script> -->
+    <script>
+        console.log("index")
+        window.onload = function () {
+            $.fn.cookie('session', GetQueryString('session'));
+            $.fn.cookie('colorNavRight', GetQueryString('colorNavRight'));
+
+            myRequest("/jfmall/homeGoodsList", {}, function (res) {
+                if (res.status == 1) {
+                    res.Data.forEach(function (item) {
+                        html = `
+                    <a external href="./detail.html?goodsCode=${item.goodsCode}" class="goods-item">
+                        <div class="goods-img">
+                            <img src="${item.picUrl}" alt="">
+                        </div>
+                        <div class="goods-title">
+                            ${item.title}
+                        </div>
+                        <div class="goods-price">
+                            <img class="jifen-icon" src="./assets/img/jifen2.png" alt="">
+                            <span class="text-orange">${item.score}</span>
+                        </div>
+                    </a>
+                    `
+                        $(".goods-wrap").append(html)
+                    });
+                } else {
+                    $.toast("session过期或网络错误！")
+                }
+            })
+            myRequest("/jfmall/getJfValue", {}, function (res) {
+                if (res.status == 1) {
+                    $("#points").html(res.Data.total)
+                } else {
+                    $.toast("session过期或网络错误！")
+                }
+            })
+        }
+    </script>
+
+</body>
+
+</html>

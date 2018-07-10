@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>收货地址</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
+    <style>
+        .list-block {
+            margin: 0;
+        }
+        .content-block button {
+            width: 90%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="page-group">
+        <div class="page page-current">
+            <!-- 你的html代码 -->
+            <div class="content">
+                <div class="list-block">
+                    <ul>
+                        <!-- Text inputs -->
+                        <li>
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <i class="icon icon-form-name"></i>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title label">收货人</div>
+                                    <div class="item-input">
+                                        <input id="name" type="text" placeholder="请输入收货人姓名">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <i class="icon icon-form-name"></i>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title label">手机号码</div>
+                                    <div class="item-input">
+                                        <input id="phone" type="text" placeholder="请输入收货人联系方式">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <i class="icon icon-form-name"></i>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title label">地址</div>
+                                    <div class="item-input">
+                                        <input type="text" id='city-picker' value="湖南 长沙 岳麓区" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <i class="icon icon-form-name"></i>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title label">详细地址</div>
+                                    <div class="item-input">
+                                        <input id="detail" type="text" placeholder="请输入街道、门牌等详细地址信息">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="content-block">
+                    <div class="row">
+                        <div class="col-50">
+                            <button onclick="cancel()" class="button button-big button-round button-dark">返回</button>
+                        </div>
+                        <div class="col-50">
+                            <button onclick="save()" class="button button-big button-fill button-round button-danger">保存地址</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script>
+    <script type="text/javascript" src="//g.alicdn.com/msui/sm/0.6.2/js/sm-city-picker.min.js" charset="utf-8"></script>
+    <script src="./assets/js/zepto.cookie.js"></script>
+    <script src="./assets/js/utils.js"></script>    
+
+    <script>
+        $(function () {
+            $(".button-danger").css("background-color","#"+$.fn.cookie("colorNavRight"))
+            $("#city-picker").cityPicker({
+                toolbarTemplate: '<header class="bar bar-nav">\
+                  <button class="button button-link pull-right close-picker">确定</button>\
+                  <h1 class="title">请选择收货地址</h1>\
+                  </header>'
+            });
+            myRequest("/jfmall/getDefaultAddress",{},function(res){
+                console.log(res)
+                if(res.status == 1 && res.Data) {
+                    $("#phone").val(res.Data.receivePhoneNum)
+                    $("#name").val(res.Data.receiveName)
+                    $("#city-picker").val(res.Data.province + " "+ res.Data.city + " " + res.Data.county)
+                    $("#detail").val(res.Data.detail)
+                } else {
+
+                }
+                
+            })
+        })
+
+        function cancel() {
+            // window.location.href = "./index.html?session="+$.fn.cookie("session")
+            window.history.go(-1);
+        }
+
+        function save() {            
+            var cityPicker = $("#city-picker").val().split(" ")
+            console.log(cityPicker)
+            if(!($("#name").val() && $("#phone").val() && $("#detail").val())) {
+                $.toast("请输入完整信息！")
+                return
+            }
+            var data  = {}
+            data.receiveName = $("#name").val()
+            data.receivePhoneNum = $("#phone").val()
+            data.detail = $("#detail").val()
+            data.province = cityPicker[0]
+            data.city = cityPicker[1]
+            data.county = cityPicker[2]
+            data.allAddress = cityPicker.join("") + $("#detail").val()
+            myRequest("/jfmall/saveDefaultAddress", data, function(res){
+                if(res.status == 1) {
+                    $.toast("保存成功！")
+                } else {
+                    $.toast("保存失败，请联系客服！")
+                }
+            })
+        }
+    </script>
+
+
+</body>
+
+</html>

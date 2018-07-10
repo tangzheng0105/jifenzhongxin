@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>兑换结果</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <link rel="stylesheet" href="./assets/css/success.css">
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css"> -->
+    <style>
+        #submit-order {
+            color: #0894ec;
+        }
+
+        #copy {
+            color: #0894ec;
+        }
+
+        #order-no {
+            color: #888;
+            margin-top: 0.4rem;
+        }
+
+        #copy {
+            padding: 0 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="page-group">
+        <div class="page page-current">
+            <!-- 你的html代码 -->
+            <div class="my-header">
+                <img class="success-icon" src="#" alt="">
+                <div class="success-text"></div>
+                <div class="success-tips">关注“兑奖记录”，掌握订单最新状态</div>
+            </div>
+            <div class="my-body">
+                <div class="goods-detail">
+                    <div class="goods-img">
+                        <img src="#" alt="">
+                    </div>
+                    <div class="goods-info">
+                        <div id="title"></div>
+                        <div id="submit-order" style="display: none;">
+                            <input id="order-input" type="text" placeholder="请输入订单号">
+                            <span onclick="submitOrder()">提交订单</span>
+                        </div>
+                        <div style="display: none;" id="order-no"></div>
+                    </div>
+                </div>
+                <div class="info">
+                    <div class="info-item">积分消耗：
+                        <span id="score"></span>积分</div>
+                    <div class="info-item">订单编号：
+                        <span id="orderNo"></span>
+                    </div>
+                    <div class="info-item">下单时间：
+                        <span id="createTime"></span>
+                    </div>
+                    <div style="display: none;" id="express-info">
+                        <div id="expressCompany" class="info-item"></div>
+                        <div id="expressNo" class="info-item">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-body">
+                <div class="commet">
+
+                </div>
+            </div>
+            <button onclick="toIndex()" id="backToIndex" class="button button-big button-fill button-danger">回到首页</button>
+        </div>
+    </div>
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <script src="./assets/js/clipboard.min.js"></script>
+    <script src="./assets/js/zepto.cookie.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <!-- <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script> -->
+    <script>
+        var exchangeCode = GetQueryString("exchangeCode")
+        $(".button-danger").css("background-color", "#" + $.fn.cookie("colorNavRight"))
+        window.onload = function () {
+            var clipboard = new ClipboardJS('#copy');
+            clipboard.on('success', function (e) {
+                console.info('Action:', e.action);
+                console.info('Text:', e.text);
+                console.info('Trigger:', e.trigger);
+                $.toast("复制成功！")
+                e.clearSelection();
+            });
+
+            clipboard.on('error', function (e) {
+                console.error('Action:', e.action);
+                console.error('Trigger:', e.trigger);
+            });
+
+            myRequest("/jfmall/getExchangeInfo", { exchangeCode: exchangeCode }, function (res) {
+                if (res.status == 1) {
+                    var pageInfo = res.Data
+
+                    switch (pageInfo.status) {
+                        case 0:
+                            $(".success-icon").attr("src", "./assets/img/pedding.png")
+                            $(".success-text").html("正在处理兑换...")
+                            $(".commet").html("说明:" + (pageInfo.resultText == null ? "" : pageInfo.resultText))
+                            break
+                        case 1:
+                            $(".success-icon").attr("src", "./assets/img/success.png")
+                            $(".success-text").html("兑换成功！")
+                            $(".commet").html("说明:" + (pageInfo.resultText == null ? "" : pageInfo.resultText))
+                            break
+                        case 2:
+                            $(".success-icon").attr("src", "./assets/img/failed.png")
+                            $(".success-text").html("兑换失败！")
+                            $(".commet").html("说明:" + pageInfo.refuseReason)
+                            break
+                        default:
+                            break
+                    }
+
+
+                    $(".goods-img img").attr("src", pageInfo.picUrl)
+                    $("#title").html(pageInfo.title)
+                    $("#score").html(pageInfo.score)
+                    $("#orderNo").html(pageInfo.orderNo)
+                    $("#createTime").html(pageInfo.createTime)
+
+
+                    console.log(pageInfo.returnStatus)
+                    console.log(pageInfo.returnOrderNo)
+                    if (pageInfo.goodsType == 3 && pageInfo.returnStatus == 0) {
+                        $(".success-icon").attr("src", "./assets/img/pedding.png")
+                        $("#submit-order").css("display", "block")
+                        $(".success-text").html("请先提交订单...")
+                        if (pageInfo.returnOrderNo) {
+                            $("#order-input").val(pageInfo.returnOrderNo)
+                            $(".success-text").html("正在审核订单...")
+                        }
+                    }
+
+                    if (pageInfo.goodsType == 2) {
+                        $("#express-info").css("display", "block")
+                        if (pageInfo.expressCompany) {
+                            $("#expressCompany").html("快递公司：" + pageInfo.expressCompany)
+                        }
+                        if (pageInfo.expressNo) {
+                            var html = `
+                            <span id="express-no-text">快递单号：${pageInfo.expressNo}</span>
+                            <span data-clipboard-text="${pageInfo.expressNo}" id="copy">复制</span>
+                            `
+                            $("#expressNo").html(html)
+                        }
+
+
+                    }
+                }
+            })
+
+
+        }
+
+        function toIndex() {
+            window.location.href = "./index.html?session=" + $.fn.cookie("session")
+        }
+
+        function submitOrder() {
+            myRequest("/jfmall/submitExchangeOrder", {
+                exchangeCode: exchangeCode,
+                orderNo: $("#order-input").val() || ""
+            }, function (res) {
+                if (res.status == 1) {
+                    $.toast("提交成功！")
+                } else {
+                    $.toast(res.errorMsg)
+                }
+
+            })
+        }
+
+        function submitOrder1() {
+            $.prompt('请输入订单号',
+                function (value) {
+                    // $.alert('Your name is "' + value + '". You clicked Ok button');
+                    myRequest("/jfmall/submitExchangeOrder", {
+                        exchangeCode: exchangeCode,
+                        orderNo: value
+                    }, function (res) {
+                        if (res.status == 1) {
+                            $.toast("提交成功！")
+                            $("#order-no").html(value)
+                            $("#order-no").css("display", "block")
+                            $("#submit-order").css("display", "none")
+                        } else {
+                            $.toast(res.errorMsg)
+                        }
+
+                    })
+                },
+                function (value) {
+                    // $.alert('Your name is "' + value + '". You clicked Cancel button');
+                }
+            );
+        }
+    </script>
+</body>
+
+</html>

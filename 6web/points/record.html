@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>兑换记录</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <!-- <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css"> -->
+    <link rel="stylesheet" href="./assets/css/dropload.css">
+    <style>
+        .buttons-tab .button.active {
+            color: #FF5155;
+            border-color: #FF5155;
+        }
+
+        .content-block {
+            margin: 0;
+            padding: 0;
+        }
+
+        .list-block {
+            margin: 0;
+        }
+
+        .list-block .item-title {
+            margin-top: 0.4rem;
+        }
+
+        .list-block .item-subtitle {
+            font-size: 0.6rem;
+            color: #FF7400;
+            margin-top: 0.2rem;
+        }
+
+        .item-title {
+            color: #888;
+        }
+
+        .next-icon {
+            position: absolute;
+            top: 1.6rem;
+            right: 0.4rem;
+            height: 0.8rem;
+        }
+
+        body {
+            overflow: scroll;
+            position: relative;
+        }
+
+        .item-date {
+            color: #888;
+            position: absolute;
+            right: 1.6rem;
+            top: 2rem;
+            font-size: 0.7rem;
+        }
+
+        .item-status {
+            position: absolute;
+            right: 1.6rem;
+            top: 0.9rem;
+            font-size: 0.6rem;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="">
+        <div class="wrap">
+            <!-- 你的html代码 -->
+            <div class="list-block media-list">
+                <ul id="list-wrap">
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+    <!-- <script type='text/javascript' src='//cdn.bootcss.com/jquery/3.3.1/jquery.min.js' charset='utf-8'></script> -->
+    <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+    <!-- <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script> -->
+    <script src="./assets/js/zepto.cookie.js"></script>
+    <script src="./assets/js/dropload.min.js"></script>
+    <script src="./assets/js/utils.js"></script>
+
+    <script>       
+        var _pageIndex = 0
+        var loadFlag = true
+
+        $(function () {
+            // getList(1,function() {})
+            $('.wrap').dropload({
+                scrollArea: window,
+                domDown: {
+                    domClass: 'dropload-down',
+                    domRefresh: '<div class="dropload-refresh">↑上拉加载更多</div>',
+                    domLoad: '<div class="dropload-load">○加载中...</div>',
+                    domNoData: '<div class="dropload-noData">没有更多数据了</div>'
+                },
+                loadDownFn: function (me) {
+                    _pageIndex += 1
+                    // if (!loadFlag) {
+                    //     me.resetload();
+                    //     me.noData();
+                    //     return
+                    // }
+                    console.log("dddd" + _pageIndex)
+                    getList(_pageIndex, function (res) {
+                        if (!res.Data.lastPage) {
+                            console.log("loading...")
+                            me.resetload();
+                        } else {
+                            loadFlag = false
+                            console.log("no data")
+                            me.resetload();
+                            me.noData();
+                        }
+                    })
+                }
+            });
+
+        })
+        function getList(pageIndex, callback) {
+            myRequest("/jfmall/exchangeList", { pages: pageIndex, pageSize: 10 }, function (res) {
+                if (res.status == 1) {
+                    res.Data.list.forEach(function (item, index) {
+                        var status
+                        switch (item.status) {
+                            case 0:
+                                status = "正在处理"
+                                color = "green"
+                                break;
+                            case 1:
+                                status = "已完成"
+                                color = "#0894ec"
+                                if(item.goodsType == 3) {
+                                   if(item.returnStatus == 0) {
+                                       status = "待返还"
+                                       color = "green"
+                                   } else {
+                                        status = "已返还"
+                                   }
+                                }
+                                if(item.goodsType == 2) {
+                                    if(item.returnStatus == 0) {
+                                       status = "待发货"
+                                       color = "green"
+                                    } 
+                                }
+                                break;
+                            case 2:
+                                status = "已拒绝"
+                                color = "red"
+                                break;
+                            default:
+                                break;
+                        }
+                        var html = `
+                    <li>
+                        <a external href="./recordDetail.html?exchangeCode=${item.exchangeCode}">
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <img src="${item.picUrl}"
+                                        width="64">
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">${item.title}</div>
+                                        <div style="font-size:0.6rem;color:${color};" class="item-status">${status}</div>
+                                    </div>
+                                    <div class="item-subtitle">
+                                        <span>${item.score}积分</span>                                        
+                                    </div>
+                                    <span class="item-date">${item.createTime.split(" ")[0].substr(5)}</span>
+                                </div>
+                            </div>
+                            <img class="next-icon" src="./assets/img/next.png" alt="">
+                        </a>
+                    </li>
+                    `
+                        $("#list-wrap").append(html)
+                    })
+                }
+                callback(res)
+            })
+        }
+    </script>
+
+</body>
+
+</html>

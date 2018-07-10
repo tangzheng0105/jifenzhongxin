@@ -1,0 +1,107 @@
+a {
+    color: #303030;
+}
+
+.bar {
+    background-color: #fff;
+}
+
+.title {
+    /* font-weight: bold; */
+    color: #FF4C06;
+    font-size: 0.8rem;
+}
+
+.text-big {
+    font-size: 1.2rem;
+}
+
+.pull-right {
+    line-height: 2.2rem;
+}
+
+.pull-left {
+    line-height: 2.2rem;
+}
+
+.my-bar {
+    overflow: hidden;
+    height: 2.2rem;
+    background-color: #fff;
+    padding: 0 0.5rem;
+}
+
+.jifen-icon {
+    width: 0.8rem;
+    margin-bottom: -0.1rem;
+}
+
+.text-orange {
+    color: #FF4C06;
+}
+
+.goods-wrap {
+    margin-top: 0.4rem;
+    background-color: #EFEFF4;
+    overflow: hidden;
+}
+
+.goods-item {
+    float: left;
+    width: 50%;
+    position: relative;
+    padding: 0.4rem;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-bottom: 1px solid #EFEFF4;
+    overflow: hidden;
+}
+
+.goods-item:nth-child(odd) {
+    border-right: 1px solid #EFEFF4;
+    /* background-color: #FF4C06; */
+}
+
+.goods-img {
+    height: 5rem;
+    width: 100%;
+    /* background-color: #FFF100; */
+}
+
+.goods-img img {
+    height: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+.goods-title {
+    font-size: 0.7rem;
+    color: #303030;
+    margin-top: 0.4rem;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.goods-price {
+    margin-top: 0.2rem;
+}
+
+.ctr-item {
+    font-size: 0.8rem;
+    text-align: center;
+    width: 50%;
+    float: left;
+    line-height: 2.2rem;
+}
+
+.ctr-item::before {
+    content: ' ';
+    height: 1.4rem;
+    position: absolute;
+    left: 50%;
+    top: 0.3rem;
+    width: 1px;
+    background-color: #EFEFF4;
+}

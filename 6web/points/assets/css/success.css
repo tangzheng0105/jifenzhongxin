@@ -1,0 +1,75 @@
+.my-header {
+    background-color: #fff;
+    padding: 0.8rem 0;
+}
+
+.success-icon {
+    display: block;
+    margin: 0 auto;
+    width: 4rem;
+    margin-bottom: 0.4rem;
+}
+
+.success-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #303030;
+}
+
+.success-tips {
+    text-align: center;
+    font-size: 0.6rem;
+    color: #909090;
+}
+
+.my-body {
+    padding: 0.6rem;
+    background-color: #fff;
+    margin-top: 0.4rem;
+}
+
+.goods-detail {
+    overflow: hidden;
+    border-bottom: 1px solid #EFEFF4;
+    padding-bottom: 0.6rem;
+}
+
+.goods-img {
+    float: left;
+    height: 3rem;
+    width: 4rem;
+    overflow: hidden;
+}
+.goods-info {
+    font-size: 0.7rem;
+    color: #303030;
+}
+.goods-info div:nth-child(1) {
+    font-weight: bold;
+    margin-top: 0.3rem;
+}
+.goods-info div:nth-child(2) {
+    color: #909090;
+    margin-top: 0.4rem;
+}
+.goods-img img {
+    height: 100%;
+    display: block;
+    margin: 0 auto;
+}
+.info {
+    margin-top: 0.4rem;
+}
+.info-item {
+    font-size: 0.6rem;
+    color: #4B4B4B;
+    margin-top: 0.2rem;
+}
+
+#backToIndex{
+    position: fixed;
+    bottom: 1rem;
+    left: 3%;
+    width: 94%;
+}
