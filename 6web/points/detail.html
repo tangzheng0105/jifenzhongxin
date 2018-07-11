@@ -175,6 +175,7 @@
                 console.info('Action:', e.action);
                 console.info('Text:', e.text);
                 console.info('Trigger:', e.trigger);
+               
                 $.toast("淘口令复制成功！")
                 e.clearSelection();
                 $("#taokouling-prop").css("display", "none")
@@ -265,6 +266,7 @@
                 } else {
                     $.toast(res.errorMsg)
                 }
+               
             })
         }
         function chooseRedbag(that, kjf, dwmz) {
@@ -307,8 +309,10 @@
                         receivePhoneNum: receivePhoneNum,
                         receiveAddress: receiveAddress
                     }
+                    $.showIndicator()
                     myRequest("/jfmall/exchange", data, function (res) {
-                        console.log(res)
+                        // console.log(res)
+                        $.hideIndicator()
                         if (res.status == 1) {
                             // $.toast("兑换成功！")
                             if (goodsType == 4 || goodsType == 2) {
@@ -317,6 +321,7 @@
                                 if (res.Data.jfMallJumpType == "forward") {
                                     window.location.href = res.Data.exchangeUrl
                                 } else {
+                                    $.hideIndicator()
                                     $("#taokouling-prop").css("display", "block")
                                     $("#taokouling-text").html(res.Data.returnTaokoulin)
                                     $("#copy").attr("data-clipboard-text", res.Data.returnTaokoulin)
@@ -328,6 +333,7 @@
                         } else {
                             $.toast(res.errorMsg)
                         }
+                        
                     })
                 },
                 function () {
